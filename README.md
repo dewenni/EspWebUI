@@ -1,9 +1,42 @@
+<div align="center">
+<img style="width: 100px;" src="./Doc/EspWebUI_Logo.svg">
+
+<h3 style="text-align: center;">EspWebUI</h3>
+</div>
+
+-----
+
+
+<div align="center">
+
+[![Current Release](https://img.shields.io/github/release/dewenni/EspWebUI.svg)](https://github.com/dewenni/EspWebUI/releases/latest)
+![GitHub Release Date](https://img.shields.io/github/release-date/dewenni/EspWebUI)
+![GitHub last commit](https://img.shields.io/github/last-commit/dewenni/EspWebUI)
+
+
+![GitHub watchers](https://img.shields.io/github/watchers/dewenni/EspWebUI?style=social)
+[![GitHub stars](https://img.shields.io/github/stars/dewenni/EspWebUI.svg?style=social&label=Star)](https://github.com/dewenni/EspWebUI/stargazers/)
+
+</div>
+
+-----
+
+<div align="center">
+If you like this project, feel free to push the <b>[Star ⭐️]</b> button and click <b>[Watch 👁]</b> to stay updated.
+<br><br>
+And if you'd like to support my work, you can also<p>
+
+[![Sponsor](https://img.shields.io/badge/Sponsor%20me%20on-GitHub-%23EA4AAA.svg?style=for-the-badge&logo=github)](https://github.com/sponsors/dewenni)
+
+</div>
+
+-----
+
 # ESP-WebUI
 
-ESP-WebUI is a framework library to build flexible and powerfull webserver based on ESP
+EspWebUI is a framework library to build flexible and powerfull webserver based on ESP
 
-## Features
-
+You can find the corresponding Template Project here: https://github.com/dewenni/EspWebUI-Template
 
 ## Installation
 
@@ -19,4 +52,4 @@ ESP-WebUI is a framework library to build flexible and powerfull webserver based
 
    ```ini
    lib_deps =
-       https://github.com/dewenni/ESP-WebUI
+       https://github.com/dewenni/EspWebUI
