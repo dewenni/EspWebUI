@@ -298,10 +298,6 @@ const lib_translations = {
     de: "Zustand",
     en: "State",
   },
-  apply: {
-    de: "Übernehmen",
-    en: "apply",
-  },
   cancel: {
     de: "abbrechen",
     en: "cancel",
