@@ -42,7 +42,7 @@ You can find the corresponding Template Project here: https://github.com/dewenni
 
 ### Arduino IDE
 
-1. Download the latest version of this library from [GitHub](https://github.com/dewenni/ESP-WebUI).
+1. Download the latest version of this library from [GitHub](https://github.com/dewenni/EspWebUI).
 2. Extract the ZIP file into your Arduino `libraries` folder.
 3. Restart the Arduino IDE.
 
