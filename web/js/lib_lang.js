@@ -126,10 +126,6 @@ const lib_translations = {
     de: "Time-Zone",
     en: "Time-Zone",
   },
-  gpio: {
-    de: "GPIO-Zuweisung",
-    en: "GPIO-Settings",
-  },
   restart: {
     de: "Neustart",
     en: "restart",
@@ -297,10 +293,6 @@ const lib_translations = {
   state: {
     de: "Zustand",
     en: "State",
-  },
-  cancel: {
-    de: "abbrechen",
-    en: "cancel",
   },
   check_github: {
     de: "Prüfe GitHub OTA Update",
