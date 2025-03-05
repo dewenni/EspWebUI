@@ -100,7 +100,7 @@ function showMsgBar(message) {
     setTimeout(() => {
       msgBar.style.display = "none";
     }, 500);
-  }, 3000);
+  }, 2500);
 }
 
 // heartbeat function
