@@ -50,6 +50,7 @@ public:
   void wsUpdateWebHref(const char *id, const char *href);
   void wsUpdateWebBusy(const char *id, bool busy);
   void wsUpdateWebDisabled(const char *id, bool disabled);
+  void wsShowInfoMsg(const char *text);
 
   // initialize JSON-Buffer
   void initJsonBuffer(JsonDocument &jsonBuf) {

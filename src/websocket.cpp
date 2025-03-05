@@ -20,6 +20,13 @@ void EspWebUI::wsSendHeartbeat() {
   }
 }
 
+void EspWebUI::wsShowInfoMsg(const char *text) {
+  JsonDocument jsonDoc;
+  jsonDoc["type"] = "showInfoMsg";
+  jsonDoc["text"] = text;
+  sendWs(jsonDoc);
+}
+
 void EspWebUI::wsLoadConfigWebUI() {
   JsonDocument jsonDoc;
   jsonDoc["type"] = "loadConfig";
@@ -33,7 +40,7 @@ void EspWebUI::wsUpdateOTAprogress(const char *progress) {
   sendWs(jsonDoc);
 }
 
- void EspWebUI::wsUpdateWebLanguage(const char *language) {
+void EspWebUI::wsUpdateWebLanguage(const char *language) {
   JsonDocument jsonDoc;
   jsonDoc["type"] = "setLanguage";
   jsonDoc["language"] = language;
