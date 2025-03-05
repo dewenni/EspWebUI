@@ -73,11 +73,37 @@ function setupWS() {
       otaProgress(message);
     } else if (message.type === "updateDialog") {
       updateDialog(message);
+    } else if (message.type === "showInfoMsg") {
+      showMsgBar(message);
     }
   };
 }
 
-// Heartbeat-Timeout zurücksetzen
+function showMsgBar(message) {
+  const msgBar = document.getElementById("msgBar");
+  const msgBarText = document.getElementById("msgBarText");
+
+  // update the message text
+  msgBarText.textContent = message.text;
+  msgBar.style.display = "block";
+
+  // Force reflow to start slide-down animation
+  void msgBar.offsetWidth;
+
+  // slide up the message bar
+  msgBar.classList.add("visible");
+
+  // hide the message bar after 2 seconds
+  setTimeout(() => {
+    msgBar.classList.remove("visible");
+
+    setTimeout(() => {
+      msgBar.style.display = "none";
+    }, 500);
+  }, 2000);
+}
+
+// heartbeat function
 function resetHeartbeat() {
   clearTimeout(heartbeatTimeout);
   heartbeatTimeout = setTimeout(() => {

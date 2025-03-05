@@ -30,7 +30,6 @@ public:
   enum uploadStatus { UPLOAD_BEGIN, UPLOAD_FINISH, UPLOAD_ERROR };
 
   // Update-Funktionen
-  void wsUpdateText(const char *id, const char *text, bool isInput);
   void wsUpdateLog(const char *entry, const char *cmd);
   void wsLoadConfigWebUI();
   void wsUpdateOTAprogress(const char *progress);
