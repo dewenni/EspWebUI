@@ -4,7 +4,15 @@ const maxReconnectDelay = 5000;
 const minReconnectDelay = 1000;
 let reconnectDelay = minReconnectDelay;
 
+function isGitHubPages() {
+  return window.location.hostname.includes("github.io");
+}
+
 function setupWS() {
+  if (isGitHubPages()) {
+    return;
+  }
+
   ws = new WebSocket("ws://" + window.location.host + "/ws");
 
   ws.onopen = function () {
