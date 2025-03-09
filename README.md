@@ -1,7 +1,7 @@
 <div align="center">
 <img style="width: 100px;" src="./Doc/EspWebUI_Logo.svg">
 
-<h3 style="text-align: center;">EspWebUI</h3>
+<h3 style="text-align: center;">EspWebUI-Library</h3>
 </div>
 
 -----
@@ -37,6 +37,13 @@ And if you'd like to support my work, you can also<p>
 EspWebUI is a framework library to build flexible and powerfull webserver based on ESP
 
 You can find the corresponding Template Project here: https://github.com/dewenni/EspWebUI-Template
+
+
+## Features & Description
+
+:construction:
+
+A list of features and a detailed description will follow....
 
 ## Installation
 
