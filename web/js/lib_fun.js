@@ -141,6 +141,12 @@ function restartFunction() {
 }
 
 function sendData(elementId, value) {
+  // check if the page is hosted on localhost or GitHub Pages
+  if (isGitHubPages()) {
+    console.log("localhost or github.io detected, skipping sendData");
+    return;
+  }
+
   // Find the element by its ID
   const element = document.getElementById(elementId);
 
