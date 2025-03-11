@@ -1,7 +1,7 @@
-# v0.0.2
+# v0.0.3
 
 ## what's new
 
 ## changelog
 
-remove toggleTimeInputs and add ´updateUIcallbackSelect()´
+[FIX] avoid sendData if there is no websocket connection (simulation mode)
