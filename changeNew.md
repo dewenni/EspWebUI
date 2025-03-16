@@ -1,7 +1,7 @@
-# v0.0.3
+# v0.0.4
 
 ## what's new
 
 ## changelog
 
-[FIX] avoid sendData if there is no websocket connection (simulation mode)
+[ADD] JavaScript - toggleElementVisibility() - add function to disable option elements in dropdown
