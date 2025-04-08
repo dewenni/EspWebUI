@@ -1,6 +1,6 @@
 #pragma once
 
-const char *faviconLibSvg = R"SVG(
+static const char *faviconLibSvg = R"SVG(
 <svg
    fill="#000000"
    height="800px"
