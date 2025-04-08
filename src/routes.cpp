@@ -1,6 +1,6 @@
 #include "EspWebUI.h"
 
-#include <favicon.h>
+#include <faviconLib.h>
 
 #include <gzip_lib_css.h>
 #include <gzip_lib_js.h>
