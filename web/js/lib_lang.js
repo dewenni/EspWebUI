@@ -210,21 +210,21 @@ const lib_translations = {
     de: "absteigend \u2B07",
     en: "descending \u2B07",
   },
-  log_mode_4: {
-    de: "Modus: Debug",
-    en: "Mode: Debug",
+  log_level_4: {
+    de: "Level: Debug",
+    en: "Level: Debug",
   },
-  log_mode_3: {
-    de: "Modus: Info",
-    en: "Mode: Info",
+  log_level_3: {
+    de: "Level: Info",
+    en: "Level: Info",
   },
-  log_mode_2: {
-    de: "Modus: Warnung",
-    en: "Mode: Warning",
+  log_level_2: {
+    de: "Level: Warnung",
+    en: "Level: Warning",
   },
-  log_mode_1: {
-    de: "Modus: Fehler",
-    en: "Modus: Error",
+  log_level_1: {
+    de: "Level: Fehler",
+    en: "Level: Error",
   },
   import: {
     de: "import (config.json)",
