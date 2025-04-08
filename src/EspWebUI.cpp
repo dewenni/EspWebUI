@@ -1,6 +1,5 @@
 // WebUI.cpp
 #include "EspWebUI.h"
-#include <faviconLib.h>
 #include <stdio.h>
 #include <string.h>
 

@@ -8,6 +8,7 @@
 #include <Update.h>
 #include <esp_log.h>
 
+#include <faviconLib.h>
 #include <gzip_user_css.h>
 #include <gzip_user_html.h>
 #include <gzip_user_js.h>
@@ -127,7 +128,7 @@ private:
   char sessionToken[TOKEN_LENGTH];
   const char cookieName[20] = "esp_jaro_auth=";
 
-  const char *faviconSvgPtr;
+  const char *faviconSvgPtr = faviconLibSvg;
 
   // Timer für Heartbeat und onLoad
   unsigned long lastHeartbeatTime;

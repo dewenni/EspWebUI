@@ -1,7 +1,5 @@
 #include "EspWebUI.h"
 
-#include <faviconLib.h>
-
 #include <gzip_lib_css.h>
 #include <gzip_lib_js.h>
 #include <gzip_login_html.h>
