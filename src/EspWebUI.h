@@ -21,7 +21,7 @@
 
 class EspWebUI {
 public:
-  EspWebUI(uint16_t port = 80);
+  EspWebUI(uint16_t port = 80, const char *faviconSvgSrc = nullptr);
 
   void begin();
   void loop();
@@ -56,11 +56,13 @@ public:
   void initJsonBuffer(JsonDocument &jsonBuf) {
     jsonBuf.clear();
     jsonBuf["type"] = "updateJSON";
+    jsonDataToSend = false;
   }
 
   // add JSON Element to JSON-Buffer
   void addJsonElement(JsonDocument &jsonBuf, const char *elementID, const char *value) {
     jsonBuf[elementID] = value; // make sure value is handled as a copy not as pointer
+    jsonDataToSend = true;
   };
 
   // add webElement - float Type
@@ -81,6 +83,9 @@ public:
     std::string s = std::to_string(static_cast<intmax_t>(value));
     addJsonElement(jsonBuf, elementID, s.c_str());
   };
+
+  // check JSON-Buffer
+  bool dataInJsonBuffer() { return jsonDataToSend; }
 
   void wsSendHeartbeat();
 
@@ -122,6 +127,8 @@ private:
   char sessionToken[TOKEN_LENGTH];
   const char cookieName[20] = "esp_jaro_auth=";
 
+  const char *faviconSvgPtr;
+
   // Timer für Heartbeat und onLoad
   unsigned long lastHeartbeatTime;
   unsigned long lastOnLoadTime;
@@ -132,6 +139,8 @@ private:
   bool isAuthenticated(AsyncWebServerRequest *request);
   void generateSessionToken(char *token, size_t length);
   String getLastModifiedDate();
+  bool jsonDataToSend = false;
+
   void sendWs(JsonDocument &jsonDoc);
 
   void sendGzipChunkedResponse(AsyncWebServerRequest *request, const uint8_t *content, size_t contentLength, const char *contentType, bool checkAuth,

@@ -9,7 +9,7 @@
 
 // Generic function to handle gzip-compressed chunked responses with customizable chunk size
 void EspWebUI::sendGzipChunkedResponse(AsyncWebServerRequest *request, const uint8_t *content, size_t contentLength, const char *contentType,
-                                    bool checkAuth, size_t chunkSize) {
+                                       bool checkAuth, size_t chunkSize) {
 
   // check if authenticated
   if (!isAuthenticated(request) && checkAuth) {
@@ -126,7 +126,7 @@ void EspWebUI::setupRoutes() {
     sendGzipChunkedResponse(request, gzip_ntp_html, gzip_ntp_html_size, "text/html", false, WEBUI_CHUNK_SIZE);
   });
 
-  server.on("/favicon.svg", HTTP_GET, [this](AsyncWebServerRequest *request) { request->send(200, "image/svg+xml", faviconSvg); });
+  server.on("/favicon.svg", HTTP_GET, [this](AsyncWebServerRequest *request) { request->send(200, "image/svg+xml", faviconSvgPtr); });
 
   // config.json download
   server.on("/config-download", HTTP_GET,

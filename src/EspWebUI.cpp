@@ -1,10 +1,18 @@
 // WebUI.cpp
 #include "EspWebUI.h"
+#include <faviconLib.h>
 #include <stdio.h>
 #include <string.h>
 
-EspWebUI::EspWebUI(uint16_t port) : server(port), ws("/ws"), lastHeartbeatTime(0), lastOnLoadTime(0) {
+EspWebUI::EspWebUI(uint16_t port, const char *faviconSvgSrc) : server(port), ws("/ws"), lastHeartbeatTime(0), lastOnLoadTime(0) {
+  // Setze den Session Token auf null/0
   memset(sessionToken, 0, sizeof(sessionToken));
+
+  if (faviconSvgSrc != nullptr) {
+    faviconSvgPtr = faviconSvgSrc;
+  } else {
+    faviconSvgPtr = faviconLibSvg;
+  }
 }
 
 void EspWebUI::begin() {
