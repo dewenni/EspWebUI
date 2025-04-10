@@ -1,7 +1,7 @@
-# v0.0.4
+# v0.0.5
 
 ## what's new
 
 ## changelog
 
-[ADD] JavaScript - toggleElementVisibility() - add function to disable option elements in dropdown
+[ADD] optional favicon parameter for WebUI.begin
