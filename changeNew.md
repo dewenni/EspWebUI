@@ -1,7 +1,7 @@
-# v0.0.5
+# v0.0.6
 
 ## what's new
 
 ## changelog
 
-[ADD] optional favicon parameter for WebUI.begin
+[ADD] Colorize logger messages depending on log level
