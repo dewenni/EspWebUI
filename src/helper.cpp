@@ -35,7 +35,7 @@ void EspWebUI::generateSessionToken(char *token, size_t length) {
 bool EspWebUI::isAuthenticated(AsyncWebServerRequest *request) {
 
   if (config.enableAuth == false) {
-    ESP_LOGD(TAG, "authentication disabled");
+    // ESP_LOGD(TAG, "authentication disabled");
     return true;
   }
 

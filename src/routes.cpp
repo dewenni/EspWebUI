@@ -26,8 +26,8 @@ void EspWebUI::sendGzipChunkedResponse(AsyncWebServerRequest *request, const uin
     return;
   }
 
-  ESP_LOGD(TAG, "sending: %s", request->url().c_str());
-  // Create a chunked response with the specified chunk size
+  // ESP_LOGD(TAG, "sending: %s", request->url().c_str());
+  //  Create a chunked response with the specified chunk size
   AsyncWebServerResponse *response =
       request->beginChunkedResponse(contentType, [content, contentLength, chunkSize](uint8_t *buffer, size_t maxLen, size_t index) -> size_t {
         // Check if we have reached the end of the file

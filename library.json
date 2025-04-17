@@ -1,6 +1,6 @@
 {
     "name": "EspWebUI",
-    "version": "0.0.6",
+    "version": "0.0.7",
     "description": "ESP WebUI Framework Library",
     "keywords": ["esp32", "webserver", "framework"],
     "repository": {

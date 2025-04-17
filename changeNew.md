@@ -1,7 +1,7 @@
-# v0.0.6
+# v0.0.7
 
 ## what's new
 
 ## changelog
 
-[ADD] Colorize logger messages depending on log level
+[CHANGE] reduce debug messages
