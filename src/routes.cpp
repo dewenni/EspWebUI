@@ -67,8 +67,8 @@ void EspWebUI::setupRoutes() {
       String username = request->getParam("username", true)->value();
       String password = request->getParam("password", true)->value();
 
-      bool usernameValid = (username == String(config.username) || username == "esp");
-      bool passwordValid = (password == String(config.password) || password == "xxx");
+      bool usernameValid = (username == String(config.username));
+      bool passwordValid = (password == String(config.password));
 
       AsyncResponseStream *response = request->beginResponseStream("application/json");
 
@@ -127,23 +127,58 @@ void EspWebUI::setupRoutes() {
   server.on("/favicon.svg", HTTP_GET, [this](AsyncWebServerRequest *request) { request->send(200, "image/svg+xml", faviconSvgPtr); });
 
   // config.json download
-  server.on("/config-download", HTTP_GET,
-            [this](AsyncWebServerRequest *request) { request->send(LittleFS, "/config.json", "application/octet-stream"); });
+  server.on("/config-download", HTTP_GET, [this](AsyncWebServerRequest *request) {
+    // config.json holds the device's WiFi/MQTT/auth credentials - unlike
+    // the static UI assets above, this must never be reachable without a
+    // valid session, regardless of the checkAuth flag those use.
+    if (!isAuthenticated(request)) {
+      request->redirect("/login");
+      return;
+    }
+    request->send(LittleFS, "/config.json", "application/octet-stream");
+  });
 
   // send config.json file
-  server.on("/config.json", HTTP_GET, [this](AsyncWebServerRequest *request) { request->send(LittleFS, "/config.json", "application/json"); });
+  server.on("/config.json", HTTP_GET, [this](AsyncWebServerRequest *request) {
+    if (!isAuthenticated(request)) {
+      request->redirect("/login");
+      return;
+    }
+    request->send(LittleFS, "/config.json", "application/json");
+  });
 
   // config.json upload
   server.on(
-      "/config-upload", HTTP_POST, [this](AsyncWebServerRequest *request) { request->send(200, "text/plain", "upload done!"); },
+      "/config-upload", HTTP_POST,
+      [this](AsyncWebServerRequest *request) {
+        if (!isAuthenticated(request)) {
+          request->send(401, "application/json", "{\"success\": false, \"error\": \"not_authenticated\"}");
+          return;
+        }
+        request->send(200, "text/plain", "upload done!");
+      },
       [this](AsyncWebServerRequest *request, const String &filename, size_t index, uint8_t *data, size_t len, bool final) {
+        // upload_handler runs once per received chunk, before the request
+        // handler above returns its response - re-check here too so an
+        // unauthenticated request can't overwrite config.json via chunks
+        // even though the final response above will correctly report 401.
+        if (!isAuthenticated(request)) {
+          return;
+        }
         static File uploadFile;
-        const String targetFilename = "/config.json"; // fix to config.json
+        const String targetFilename = "/config.json";     // fix to config.json
+        const String tempFilename = "/config.json.upload"; // staged until complete
 
+        // Upload into a temporary file and only move it into place once the
+        // last chunk has arrived. Opening the real config.json with "w"
+        // truncated it immediately, so a browser tab closed mid-upload - or a
+        // dropped WiFi link, since "final" then never fires - left a truncated
+        // JSON prefix behind. On the next boot the device failed to parse its
+        // own config and came up as an access point with no credentials.
         if (!index) { // firs call for upload
           callbackUpload(UPLOAD_BEGIN, "uploading...");
           ESP_LOGI(TAG, "Upload Start: %s\n", filename.c_str());
-          uploadFile = LittleFS.open(targetFilename, "w"); // fix to config.json
+          uploadFile = LittleFS.open(tempFilename, "w");
 
           if (!uploadFile) {
             callbackUpload(UPLOAD_ERROR, "error on file close!");
@@ -159,8 +194,14 @@ void EspWebUI::setupRoutes() {
         if (final) {
           if (uploadFile) {
             uploadFile.close();
-            ESP_LOGI(TAG, "UploadEnd: %s, %u B\n", filename.c_str(), index + len);
-            callbackUpload(UPLOAD_FINISH, "upload done!");
+            LittleFS.remove(targetFilename); // rename() cannot overwrite on LittleFS
+            if (LittleFS.rename(tempFilename, targetFilename)) {
+              ESP_LOGI(TAG, "UploadEnd: %s, %u B\n", filename.c_str(), index + len);
+              callbackUpload(UPLOAD_FINISH, "upload done!");
+            } else {
+              ESP_LOGE(TAG, "failed to move uploaded config into place");
+              callbackUpload(UPLOAD_ERROR, "error on file close!");
+            }
           } else {
             callbackUpload(UPLOAD_ERROR, "error on file close!");
           }
@@ -169,8 +210,20 @@ void EspWebUI::setupRoutes() {
 
   // Route für OTA-Updates
   server.on(
-      "/update", HTTP_POST, [this](AsyncWebServerRequest *request) {},
+      "/update", HTTP_POST,
+      [this](AsyncWebServerRequest *request) {
+        if (!isAuthenticated(request)) {
+          request->send(401, "text/plain", "not authenticated");
+        }
+      },
       [this](AsyncWebServerRequest *request, const String &filename, size_t index, uint8_t *data, size_t len, bool final) {
+        // body/upload handler runs per chunk, before the request handler
+        // above returns its response - flashing must not proceed on an
+        // unauthenticated request even if the final response above hasn't
+        // been sent yet.
+        if (!isAuthenticated(request)) {
+          return;
+        }
         this->handleDoUpdate(request, filename, index, data, len, final);
       });
 }
