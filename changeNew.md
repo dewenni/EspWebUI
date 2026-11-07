@@ -1,7 +1,7 @@
-# v0.0.7
+# v0.0.8
 
 ## what's new
 
 ## changelog
 
-[CHANGE] reduce debug messages
+[CHANGE] Auth consolidation across a few routes #3 by @xn101de
