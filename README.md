@@ -113,3 +113,11 @@ Run the checker regression tests with:
 ```sh
 python3 -B -m unittest discover -s tests
 ```
+
+## WebSocket transport
+
+The WebUI selects its WebSocket protocol from the page URL: HTTP uses `ws://`,
+HTTPS uses `wss://`. The page's host and port are retained, with `/ws` as the
+WebSocket endpoint. An HTTPS reverse proxy or tunnel must forward WebSocket
+connections to the ESP. This selection does not add TLS support to the ESP;
+when a proxy terminates TLS, its connection to the ESP can still use plain HTTP/WS.
