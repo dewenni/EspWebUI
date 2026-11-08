@@ -1,9 +1,13 @@
-# v0.0.9
+# v0.0.10
 
 ## what's new
 
-[ADD] Project-specific font size adjustment with `--pico-font-size-override`.
+[ADD] Build-time translation validation now includes JavaScript reads as well as HTML.
 
 ## changelog
 
-[CHANGE] Responsive base font sizes now range from 75% to 100%. The default offset is 0%; set it in the project's custom.css to adjust all breakpoints.
+[FIX] Recognize translation keys passed through project-specific helper functions, including forwarded parameters, conditional literal arguments and template interpolations. No helper name is hardcoded.
+
+[CHANGE] Analyze library and project JavaScript together. Unused-key warnings and missing-key errors now refer to HTML and JavaScript. Translation declarations, comments and unrelated strings do not count as uses.
+
+[TEST] Add regression tests for translation reads, helper forwarding, missing/unused keys and duplicate declarations.

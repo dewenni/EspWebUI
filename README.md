@@ -81,3 +81,35 @@ supported. Use a percentage value, including `0%` for no adjustment.
 
 Remove any project-specific `--pico-font-size` breakpoint declarations when
 switching to this offset, since they override the library's calculated values.
+
+## Build-time translation checks
+
+The build checks translations declared in `lib_translations` and `user_translations`
+against both `data-i18n` attributes in HTML and translation reads in JavaScript.
+Library and project JavaScript are checked together, including project helper
+functions; their names are not hardcoded. For example:
+
+```js
+function text(key) {
+  return user_translations[key][lang];
+}
+
+status.textContent = text(success ? "connected" : "disconnected");
+```
+
+Direct accesses such as `user_translations.connected[lang]` or
+`lib_translations["close"][lang]` are also recognized, as are forwarded key
+parameters in named functions and assigned arrow functions, and calls inside
+template interpolations. Declarations, comments and unrelated string literals
+do not count as uses. Missing literal keys fail the build; unused declarations
+and duplicate keys produce warnings.
+
+This is a static check, not a JavaScript interpreter. Runtime-generated keys
+(e.g. `text("state_" + state)`), variable aliases and other dynamic data flows
+cannot be reliably resolved. Prefer explicit literal alternatives when possible.
+
+Run the checker regression tests with:
+
+```sh
+python3 -B -m unittest discover -s tests
+```
