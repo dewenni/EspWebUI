@@ -1,4 +1,9 @@
 /* custom css definitions */
+:root {
+  /* Add percentage points to every responsive font-size breakpoint. */
+  --pico-font-size-override: 0%;
+}
+
 [data-theme="dark"] {
   --pico-card-sectioning-background-color: #3d475c;
   --pico-card-background-color: #202632;
@@ -11,32 +16,32 @@
 
 @media (min-width: 100px) {
   :root {
-    --pico-font-size: 90%;
+    --pico-font-size: calc(75% + var(--pico-font-size-override, 0%));
   }
 }
 @media (min-width: 576px) {
   :root {
-    --pico-font-size: 90%;
+    --pico-font-size: calc(80% + var(--pico-font-size-override, 0%));
   }
 }
 @media (min-width: 768px) {
   :root {
-    --pico-font-size: 95%;
+    --pico-font-size: calc(85% + var(--pico-font-size-override, 0%));
   }
 }
 @media (min-width: 1024px) {
   :root {
-    --pico-font-size: 100%;
+    --pico-font-size: calc(90% + var(--pico-font-size-override, 0%));
   }
 }
 @media (min-width: 1280px) {
   :root {
-    --pico-font-size: 105%;
+    --pico-font-size: calc(95% + var(--pico-font-size-override, 0%));
   }
 }
 @media (min-width: 1536px) {
   :root {
-    --pico-font-size: 110%;
+    --pico-font-size: calc(100% + var(--pico-font-size-override, 0%));
   }
 }
 

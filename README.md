@@ -60,3 +60,24 @@ A list of features and a detailed description will follow....
    ```ini
    lib_deps =
        https://github.com/dewenni/EspWebUI
+
+   ```
+
+## Project font size
+
+EspWebUI uses responsive base font sizes of 75%, 80%, 85%, 90%, 95%, and 100%
+at viewport widths of 100, 576, 768, 1024, 1280, and 1536 pixels respectively.
+Set an offset in your project's `web/css/custom.css` to adjust all breakpoints:
+
+```css
+:root {
+  --pico-font-size-override: 10%;
+}
+```
+
+The default offset is `0%`. The example adds 10 percentage points, resulting
+in 85%, 90%, 95%, 100%, 105%, and 110%. Negative offsets such as `-5%` are also
+supported. Use a percentage value, including `0%` for no adjustment.
+
+Remove any project-specific `--pico-font-size` breakpoint declarations when
+switching to this offset, since they override the library's calculated values.
