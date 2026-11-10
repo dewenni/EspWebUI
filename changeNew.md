@@ -1,11 +1,13 @@
-# v0.0.11
+# v0.0.12
 
 ## what's new
 
-[ADD] Automatically use secure WebSockets (`wss://`) when the WebUI is opened over HTTPS.
+[FIX] Make WebSocket connections more resilient when browser tabs are in the background.
 
 ## changelog
 
-[CHANGE] Select `ws://` for HTTP and `wss://` for HTTPS using the page's protocol, host and port. This supports HTTPS reverse proxies and tunnels without changing direct HTTP access.
+[CHANGE] Treat every received WebSocket message as a sign of life and allow 30 seconds without data while the page is visible.
 
-[CREDIT] Based on dewenni/ESP_Buderus_KM271#180 by @kwaaak. Implemented in the library source so generated WebUI builds retain the change.
+[FIX] Pause the inactivity watchdog for hidden pages. On return, allow fresh data on open connections and immediately reconnect closed connections.
+
+[FIX] Prevent duplicate connection attempts and reconnect timers, and ignore callbacks from obsolete sockets.

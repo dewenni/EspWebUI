@@ -1,5 +1,7 @@
 let ws;
 let heartbeatTimeout;
+let reconnectTimer;
+const heartbeatTimeoutMs = 30000;
 const maxReconnectDelay = 5000;
 const minReconnectDelay = 1000;
 let reconnectDelay = minReconnectDelay;
@@ -20,27 +22,37 @@ function setupWS() {
     console.log("WebSocket setup started");
   }
 
+  // Only one connection attempt and reconnect timer may be active.
+  if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING || ws.readyState === WebSocket.CLOSING)) return;
+  clearTimeout(reconnectTimer);
+  reconnectTimer = undefined;
   const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-  ws = new WebSocket(protocol + "//" + window.location.host + "/ws");
+  const socket = ws = new WebSocket(protocol + "//" + window.location.host + "/ws");
 
-  ws.onopen = function () {
+  socket.onopen = function () {
+    if (ws !== socket) return;
     console.log("WebSocket connected");
     resetHeartbeat();
     hideReloadBar();
     reconnectDelay = minReconnectDelay;
   };
 
-  ws.onclose = function () {
+  socket.onclose = function () {
+    if (ws !== socket) return;
+    clearTimeout(heartbeatTimeout);
     console.log("WebSocket disconnected. Retrying...");
     attemptReconnect();
     showReloadBar();
   };
 
-  ws.onerror = function (error) {
+  socket.onerror = function (error) {
+    if (ws !== socket) return;
     console.log("WebSocket error:", error);
   };
 
-  ws.onmessage = function (event) {
+  socket.onmessage = function (event) {
+    if (ws !== socket) return;
+    resetHeartbeat(); // Every received frame proves the connection is alive.
     let message = JSON.parse(event.data);
     //console.log(message);
     if (message.type === "redirect") {
@@ -48,7 +60,7 @@ function setupWS() {
       ws.close();
       window.location.href = message.url;
     } else if (message.type === "heartbeat") {
-      resetHeartbeat();
+      // Already handled above, like all other messages.
     } else if (message.type === "loadConfig") {
       loadConfig();
     } else if (message.type === "updateText") {
@@ -111,23 +123,41 @@ function showMsgBar(message) {
   }, 2500);
 }
 
-// heartbeat function
+// Watch only visible pages: background suspension must not close a healthy socket.
 function resetHeartbeat() {
   clearTimeout(heartbeatTimeout);
+  const socket = ws;
+  if (document.hidden || !socket || socket.readyState !== WebSocket.OPEN) return;
   heartbeatTimeout = setTimeout(() => {
-    console.warn("No heartbeat received, reconnecting...");
-    ws.close();
+    if (document.hidden || ws !== socket || socket.readyState !== WebSocket.OPEN) return;
+    console.warn("No WebSocket data received, reconnecting...");
+    socket.close();
     showReloadBar();
-  }, 5000);
+  }, heartbeatTimeoutMs);
 }
 
 function attemptReconnect() {
-  setTimeout(() => {
-    console.log(`Attempting reconnect in ${reconnectDelay / 1000} seconds...`);
+  if (reconnectTimer !== undefined) return;
+  const delay = reconnectDelay;
+  console.log(`Attempting reconnect in ${delay / 1000} seconds...`);
+  reconnectTimer = setTimeout(() => {
+    reconnectTimer = undefined;
+    reconnectDelay = Math.min(delay * 2, maxReconnectDelay);
     setupWS();
-    reconnectDelay = Math.min(reconnectDelay * 2, maxReconnectDelay);
-  }, reconnectDelay);
+  }, delay);
 }
+
+document.addEventListener("visibilitychange", () => {
+  if (isGitHubPages()) return;
+  if (document.hidden) {
+    clearTimeout(heartbeatTimeout);
+  } else if (ws && ws.readyState === WebSocket.OPEN) {
+    // Allow fresh messages to arrive after resuming, even after a long pause.
+    resetHeartbeat();
+  } else {
+    setupWS();
+  }
+});
 
 function restartFunction() {
   const activeElement = document.activeElement;
