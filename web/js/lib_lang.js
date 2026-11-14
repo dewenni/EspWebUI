@@ -2,6 +2,13 @@
 // localization texts
 // --------------------------------------
 const lib_translations = {
+  settings_area: { de: "Bereich", en: "Category" },
+  settings_general: { de: "Allgemein", en: "General" },
+  settings_network: { de: "Netzwerk", en: "Network" },
+  settings_integrations: { de: "Integrationen", en: "Integrations" },
+  settings_device: { de: "Gerät", en: "Device" },
+  settings_maintenance: { de: "Zugriff & Wartung", en: "Access & maintenance" },
+  settings_time: { de: "Datum & Uhrzeit", en: "Date & time" },
   system: {
     de: "System",
     en: "System",

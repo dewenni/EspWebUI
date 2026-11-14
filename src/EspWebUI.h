@@ -89,12 +89,18 @@ public:
   bool dataInJsonBuffer() { return jsonDataToSend; }
 
   void wsSendHeartbeat();
+  // Application-specific, request-paced replies to a single connected client.
+  bool wsSendClient(uint32_t clientId, JsonDocument &jsonDoc);
 
   // callback functions
   void setCallbackOta(void (*callback)(EspWebUI::otaStatus otaState, const char *msg)) { callbackOta = callback; }
   void setCallbackUpload(void (*callback)(EspWebUI::uploadStatus uploadState, const char *msg)) { callbackUpload = callback; }
   void setCallbackReload(void (*callback)()) { callbackReload = callback; }
   void setCallbackWebElement(void (*callback)(const char *elementID, const char *elementValue)) { callbackWebElement = callback; }
+
+  void setCallbackWebElementClient(void (*callback)(uint32_t clientId, const char *elementID, const char *elementValue)) {
+    callbackWebElementClient = callback;
+  }
 
   // set credentials for authentication
   void setCredentials(const char *username, const char *password) {
@@ -115,6 +121,8 @@ private:
   void (*callbackUpload)(EspWebUI::uploadStatus uploadState, const char *msg) = nullptr;
   void (*callbackReload)() = nullptr;
   void (*callbackWebElement)(const char *elementID, const char *elementValue) = nullptr;
+
+  void (*callbackWebElementClient)(uint32_t clientId, const char *elementID, const char *elementValue) = nullptr;
 
   struct EspWebUIConfig {
     // Sized to match what consumers actually store. At 32 bytes a 40-character

@@ -5,6 +5,7 @@ from pathlib import Path
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 path = Path(__file__).resolve().parents[1] / "scripts" / "checkText.py"
 spec = importlib.util.spec_from_file_location("checkText", path)
@@ -109,6 +110,27 @@ class CheckerTests(unittest.TestCase):
         self.assertTrue(any("'missing_js'" in line and 'JavaScript' in line for line in logs.output))
         self.assertTrue(any("'missing_html'" in line and 'HTML' in line for line in logs.output))
         self.assertFalse(any("'js_only'" in line for line in logs.output))
+
+    def test_unused_shared_vocabulary_is_allowed_but_project_texts_are_checked(self):
+        lib = 'const lib_translations={shared_optional:{de:"x"}};'
+        with patch("logging.warning") as warning:
+            self.assertTrue(self.run_check(lib,
+                'const user_translations={used:{de:"x"}}; user_translations.used.de;'))
+            warning.assert_not_called()
+        with self.assertLogs(level=logging.WARNING) as logs:
+            self.assertTrue(self.run_check(lib,
+                'const user_translations={unused_project:{de:"x"}};'))
+        self.assertTrue(any("'unused_project'" in line for line in logs.output))
+        self.assertFalse(any("'shared_optional'" in line for line in logs.output))
+
+    def test_both_header_states_are_detected(self):
+        with patch("logging.warning") as warning:
+            self.assertTrue(self.run_check('const lib_translations={};', '''
+                const user_translations={ui_connected:{de:"x"},ui_disconnected:{de:"y"}};
+                const labels=connected ? user_translations.ui_connected : user_translations.ui_disconnected;
+                labels[language];
+            '''))
+            warning.assert_not_called()
 
     def test_missing_dictionary_and_duplicate_keys(self):
         with self.assertLogs(level=logging.ERROR):

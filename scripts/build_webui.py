@@ -2,6 +2,7 @@ import os
 import re
 import gzip
 import glob
+import html
 from SCons.Script import DefaultEnvironment
 
 def ensure_directory_exists(path):
@@ -10,20 +11,25 @@ def ensure_directory_exists(path):
             print(f"folder '{path}' was created.")
 
 def compress_to_gzip_c_array(input_file_path, output_file_path, var_name):
-    # HTML-Datei einlesen
     with open(input_file_path, 'rb') as file:
         content = file.read()
-    
-    # Inhalt mit Brotli komprimieren
+    write_gzip_c_array(content, output_file_path, var_name)
+
+
+def write_gzip_c_array(content, output_file_path, var_name):
     compressed_content = gzip.compress(content)
-    
-    # Komprimierten Inhalt in ein C-Array umwandeln
-    c_array_content = ', '.join(['0x{:02x}'.format(byte) for byte in compressed_content])
-    
-    # C-Array in eine neue Datei schreiben
+    c_array_content = ', '.join('0x{:02x}'.format(byte) for byte in compressed_content)
     with open(output_file_path, 'w') as file:
         file.write('const uint8_t PROGMEM ' + var_name + '[] = {' + c_array_content + '};\n')
         file.write(f'const unsigned int {var_name}_size = {len(compressed_content)};\n')
+
+
+def render_login_html(template, project_html):
+    # Reuse the project page title; never expose configuration before login.
+    match = re.search(r'<title\b[^>]*>(.*?)</title>', project_html, re.I | re.S)
+    title = html.unescape(match.group(1)).strip() if match else 'ESP WebUI'
+    return template.replace('{{PROJECT_TITLE}}', html.escape(title, quote=True))
+
 
 def convert_to_c_array(input_file_path, output_file_path, var_name):
     # HTML-Datei einlesen
@@ -107,7 +113,9 @@ def main(web_dir, output_dir):
     # Pfad zur HTML-Datei und zum Ausgabe-C-Datei
     input_html_file = '../web/html/lib_login.html'
     output_c_file = '../include/gzip_login_html.h'
-    compress_to_gzip_c_array(input_html_file, output_c_file, 'gzip_login_html')
+    with open(input_html_file, 'r', encoding='utf-8') as file:
+        login_html = render_login_html(file.read(), combined_html)
+    write_gzip_c_array(login_html.encode('utf-8'), output_c_file, 'gzip_login_html')
 
     # ---------------------------------------------------------------
 

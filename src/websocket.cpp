@@ -13,6 +13,16 @@ void EspWebUI::sendWs(JsonDocument &jsonDoc) {
   }
 }
 
+bool EspWebUI::wsSendClient(uint32_t clientId, JsonDocument &jsonDoc) {
+  auto *client = ws.client(clientId);
+  if (!client || !client->canSend() || jsonDoc.overflowed()) return false;
+  const size_t length = measureJson(jsonDoc);
+  auto *buffer = ws.makeBuffer(length);
+  if (!buffer) return false;
+  serializeJson(jsonDoc, buffer->get(), length);
+  return client->text(buffer);
+}
+
 void EspWebUI::wsSendHeartbeat() {
   ws.cleanupClients(WEBUI_MAX_WS_CLIENT);
   if (ws.count()) {
@@ -203,7 +213,8 @@ void EspWebUI::setupWebSocket() {
           }
           const char *elementId = jsonDoc["elementId"];
           const char *value = jsonDoc["value"];
-          callbackWebElement(elementId, value);
+          if (callbackWebElementClient) callbackWebElementClient(client->id(), elementId, value);
+          else if (callbackWebElement) callbackWebElement(elementId, value);
         }
       }
     }

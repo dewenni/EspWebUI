@@ -35,6 +35,7 @@ function setupWS() {
     resetHeartbeat();
     hideReloadBar();
     reconnectDelay = minReconnectDelay;
+    window.dispatchEvent(new Event("webui:connected"));
   };
 
   socket.onclose = function () {
@@ -43,6 +44,7 @@ function setupWS() {
     console.log("WebSocket disconnected. Retrying...");
     attemptReconnect();
     showReloadBar();
+    window.dispatchEvent(new Event("webui:disconnected"));
   };
 
   socket.onerror = function (error) {
@@ -95,6 +97,8 @@ function setupWS() {
       updateDialog(message);
     } else if (message.type === "showInfoMsg") {
       showMsgBar(message);
+    } else {
+      window.dispatchEvent(new CustomEvent("webui:message", { detail: message }));
     }
   };
 }

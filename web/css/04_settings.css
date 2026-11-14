@@ -1,0 +1,112 @@
+/* One category list on desktop; one compact selector on narrow content areas. */
+.settings-layout {
+  container-type: inline-size;
+  width: 100%;
+  max-width: 72rem;
+}
+
+.settings-body {
+  display: grid;
+  grid-template-columns: 12rem minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.settings-category-nav { display: none; }
+.settings-ready .settings-category-nav { display: block; }
+.settings-category-list { display: grid; gap: 0.4rem; }
+.settings-category-picker { display: none; }
+
+.settings-category-list button {
+  width: 100%;
+  margin: 0;
+  padding: 0.75rem;
+  border: 0;
+  border-radius: var(--pico-border-radius);
+  background: transparent;
+  color: var(--pico-muted-color);
+  text-align: left;
+  box-shadow: none;
+}
+
+.settings-category-list button:hover,
+.settings-category-list button[aria-pressed="true"] {
+  background: var(--pico-card-sectioning-background-color);
+  color: var(--pico-color);
+}
+
+.settings-category-list button:focus-visible {
+  outline: 2px solid var(--pico-primary);
+  outline-offset: 2px;
+}
+
+.settings-panels { grid-column: 1 / -1; min-width: 0; }
+.settings-ready .settings-panels { grid-column: 2; }
+.settings-panel[hidden] { display: none; }
+.settings-panel > h2 { margin-bottom: 1.25rem; font-size: 1.25rem; }
+.settings-panel > details { margin-bottom: 0; }
+.settings-panel > hr { margin-block: 1.25rem; }
+.settings-panel h3 { font-size: 1rem; margin-top: 1.5rem; }
+.settings-panel h3:first-of-type { margin-top: 0; }
+.settings-panel .settings-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  align-items: start;
+}
+.settings-panel .settings-container > div { min-width: 0; }
+.settings-actions { margin-top: 1.5rem; }
+.settings-actions button { width: auto; margin: 0; }
+
+/* Optional horizontal categories; only projects opting in use this layout. */
+.settings-layout[data-settings-layout="tabs"] .settings-body {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.25rem;
+}
+.settings-layout[data-settings-layout="tabs"] .settings-panels { grid-column: 1; }
+.settings-layout[data-settings-layout="tabs"] .settings-category-nav {
+  position: relative;
+  overflow: hidden;
+}
+.settings-layout[data-settings-layout="tabs"] .settings-category-list {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.35rem;
+  padding: 0.2rem 0.2rem 0.5rem;
+  border-bottom: 1px solid var(--pico-form-element-border-color);
+}
+.settings-layout[data-settings-layout="tabs"] .settings-category-list button {
+  flex: 0 0 auto;
+  width: auto;
+  white-space: nowrap;
+}
+.settings-layout[data-settings-layout="tabs"] .settings-category-picker { display: none; }
+.settings-layout[data-settings-layout="tabs"].settings-compact .settings-category-picker {
+  display: block;
+  margin: 0;
+}
+.settings-layout[data-settings-layout="tabs"].settings-compact .settings-category-picker select { margin-bottom: 0; }
+.settings-layout[data-settings-layout="tabs"].settings-compact .settings-category-list {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: max-content;
+  max-width: none;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+@container (max-width: 700px) {
+  .settings-body { grid-template-columns: minmax(0, 1fr); gap: 1rem; }
+  .settings-ready .settings-panels { grid-column: 1; }
+  .settings-category-list { display: none; }
+  .settings-category-picker { display: block; margin: 0; }
+  .settings-category-picker select { margin-bottom: 0; }
+  .settings-panel .row { flex-wrap: wrap; gap: 0.75rem; }
+  .settings-panel .row > input:not([type="checkbox"]):not([type="radio"]) {
+    flex: 1 1 100%;
+    min-width: 0;
+    margin: 0;
+  }
+  .settings-panel .row button { margin: 0; height: auto; }
+  .settings-panel .row input[type="checkbox"] { margin: 0; }
+}

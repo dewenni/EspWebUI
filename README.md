@@ -121,3 +121,30 @@ HTTPS uses `wss://`. The page's host and port are retained, with `/ws` as the
 WebSocket endpoint. An HTTPS reverse proxy or tunnel must forward WebSocket
 connections to the ESP. This selection does not add TLS support to the ESP;
 when a proxy terminates TLS, its connection to the ESP can still use plain HTTP/WS.
+
+
+## Settings navigation and application hooks
+
+See [Settings navigation](Doc/settings-navigation.md) for category markup,
+responsive tabs/sidebar layouts and optional initial selection. Controls marked
+`data-ui-local` are handled by the application instead of automatically sending
+button/select events to the ESP.
+
+The generated login page uses the application HTML's `<title>` as its name,
+escapes it as text and uses `ESP WebUI` if no title is provided. Login texts use
+the browser's German or English language; configuration is not fetched before login.
+
+Browser applications can listen for `webui:connected`, `webui:disconnected`, and
+`webui:message`. The latter carries unhandled application messages in `event.detail`.
+
+`setCallbackWebElementClient(callback)` receives `(clientId, elementID, elementValue)`
+and takes precedence over `setCallbackWebElement`. Forward common commands in that
+callback if needed. `wsSendClient(clientId, jsonDoc)` replies to that client only
+and returns false when the client is unavailable, cannot send, or allocation fails.
+The existing broadcast/element update mechanisms remain available.
+
+The legacy GitHub version dialog is optional. Projects without `version_dialog`
+can provide their own inline update interface and handlers.
+
+Unused-translation warnings apply to project vocabulary only. Missing translations
+and duplicate declarations are still checked across library and project texts.

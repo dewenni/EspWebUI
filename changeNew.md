@@ -1,13 +1,19 @@
-# v0.0.12
+# v0.0.13
 
 ## what's new
 
-[FIX] Make WebSocket connections more resilient when browser tabs are in the background.
+[NEW] Shared settings categories with horizontal tabs or a sidebar, responsive dropdown navigation and German/English labels.
+
+[NEW] Compact, theme-aware login page with the application title and German/English browser-language selection.
 
 ## changelog
 
-[CHANGE] Treat every received WebSocket message as a sign of life and allow 30 seconds without data while the page is visible.
+[NEW] Add client-specific JSON WebSocket replies and a callback that includes the requesting client ID.
 
-[FIX] Pause the inactivity watchdog for hidden pages. On return, allow fresh data on open connections and immediately reconnect closed connections.
+[NEW] Expose browser events for WebSocket connections, disconnections and application-specific messages.
 
-[FIX] Prevent duplicate connection attempts and reconnect timers, and ignore callbacks from obsolete sockets.
+[CHANGE] Support local-only controls through `data-ui-local` and make the legacy GitHub version dialog optional for projects that show updates directly on their Tools page.
+
+[FIX] Only report unused project translations; shared library vocabulary may remain unused by individual applications.
+
+[DOC] Document settings navigation and application integration hooks.

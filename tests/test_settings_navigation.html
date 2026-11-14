@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>Settings navigation regression test</title>
+<link rel="stylesheet" href="../web/css/04_settings.css">
+<div class="settings-layout" data-settings data-settings-initial="network">
+  <div class="settings-body">
+    <aside class="settings-category-nav">
+      <label class="settings-category-picker">Category<select data-settings-select data-ui-local></select></label>
+      <div data-settings-list class="settings-category-list"></div>
+    </aside>
+    <div class="settings-panels">
+      <section id="general" data-settings-group="general" data-settings-label="settings_general" class="settings-panel"><h2>General</h2></section>
+      <section id="network" data-settings-group="network" data-settings-label="settings_network" class="settings-panel"><h2>Network</h2><input id="cfg_hostname" value="original"></section>
+      <section id="device" data-settings-group="device" data-settings-label="settings_device" class="settings-panel"><h2>Device</h2><details><summary>Hardware</summary>GPIO</details></section>
+    </div>
+  </div>
+</div>
+<pre id="result" role="status"></pre>
+<script src="../web/js/lib_settings.js"></script>
+<script>
+// Open this file in a browser; no packages, server, or device connection required.
+(async () => {
+  const root = document.querySelector('[data-settings]');
+  const result = document.getElementById('result');
+  const assert = (condition, message) => { if (!condition) throw Error(message); };
+  const wait = () => new Promise(resolve => setTimeout(resolve, 50));
+  try {
+    assert(Array.from(root.querySelectorAll('section')).every(section => !section.hidden), 'No-JS fallback');
+    initializeSettingsNavigation();
+    const buttons = Array.from(root.querySelectorAll('[data-settings-list] button'));
+    const select = root.querySelector('select');
+    assert(buttons.length === 3 && select.options.length === 3, 'Declared categories');
+    assert(!document.getElementById('network').hidden && document.getElementById('general').hidden, 'Initial category');
+    const hostname = document.getElementById('cfg_hostname');
+    let changes = 0;
+    hostname.addEventListener('change', () => changes++);
+    hostname.value = 'edited';
+    document.querySelector('#device details').open = true;
+    buttons[2].click();
+    assert(!document.getElementById('device').hidden && select.value === 'device', 'Button selects category');
+    assert(buttons[2].getAttribute('aria-pressed') === 'true', 'Selected button');
+    select.value = 'network';
+    select.dispatchEvent(new Event('change'));
+    assert(!document.getElementById('network').hidden, 'Select selects category');
+    assert(hostname === document.getElementById('cfg_hostname') && hostname.value === 'edited', 'Input node and edit retained');
+    hostname.dispatchEvent(new Event('change'));
+    assert(changes === 1 && document.querySelector('#device details').open, 'Listeners and expanded sections retained');
+    assert(buttons.every(button => button.hasAttribute('data-ui-local')) && select.hasAttribute('data-ui-local'), 'Local controls');
+    assert(root.querySelectorAll('button:not([data-ui-local]),select:not([data-ui-local])').length === 0, 'Excluded from generic command selectors');
+    initializeSettingsNavigation();
+    assert(root.querySelectorAll('[data-settings-list] button').length === 3, 'Idempotent initialization');
+    for (const width of [1000, 320]) {
+      root.style.width = width + 'px';
+      await wait();
+      const narrow = root.clientWidth <= 700;
+      assert((getComputedStyle(root.querySelector('.settings-category-list')).display === 'none') === narrow, 'Responsive category list');
+      assert((getComputedStyle(root.querySelector('.settings-category-picker')).display !== 'none') === narrow, 'Responsive select');
+      assert(root.scrollWidth <= root.clientWidth + 1, 'No horizontal overflow');
+    }
+    result.textContent = 'PASS: categories, selection, retained fields/listeners, command exclusion, repeated initialization, responsive layout';
+    result.dataset.test = 'PASS';
+  } catch (error) {
+    result.textContent = 'FAIL: ' + error.message;
+    result.dataset.test = 'FAIL';
+    throw error;
+  }
+})();
+</script>
+</html>

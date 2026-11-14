@@ -1,6 +1,8 @@
 // --------------------------------------
 // --------------------------------------
 document.addEventListener("DOMContentLoaded", function () {
+  initializeSettingsNavigation();
+
   // call functions on refresh
   setupWS();
   synchronizeDataSyncFields();
@@ -15,25 +17,20 @@ document.addEventListener("DOMContentLoaded", function () {
       window.location.reload();
     });
 
-  // VERSION: is called when version dialog is opened
-  document.getElementById("p00_version").addEventListener("click", function () {
-    document.getElementById("version_dialog").showModal();
-    sendData("check_git_version", "");
-  });
-
-  // VERSION: is called when github ota button is clicked
-  document
-    .getElementById("p11_check_git_btn")
-    .addEventListener("click", function () {
-      document.getElementById("version_dialog").showModal();
+  // Older project UIs can still provide the optional version dialog.
+  const versionDialog = document.getElementById("version_dialog");
+  if (versionDialog) {
+    document.getElementById("p00_version").addEventListener("click", function () {
+      versionDialog.showModal();
+      sendData("check_git_version", "");
     });
-
-  // VERSION: close version dialog on button click
-  document
-    .getElementById("close_version_Dialog_btn")
-    .addEventListener("click", function () {
-      document.getElementById("version_dialog").close();
+    document.getElementById("p11_check_git_btn").addEventListener("click", function () {
+      versionDialog.showModal();
     });
+    document.getElementById("close_version_Dialog_btn").addEventListener("click", function () {
+      versionDialog.close();
+    });
+  }
 
   // OTA: close ota-failed dialog on button click
   document
@@ -174,7 +171,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // Event-Listener for Buttons
-  document.querySelectorAll("button").forEach(function (button) {
+  document.querySelectorAll("button:not([data-ui-local])").forEach(function (button) {
     button.addEventListener("click", function () {
       sendData(button.id, true);
     });
@@ -212,7 +209,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
   // Event-Listener for Select Elements
-  document.querySelectorAll("select").forEach(function (selectElement) {
+  document.querySelectorAll("select:not([data-ui-local])").forEach(function (selectElement) {
     selectElement.addEventListener("change", function () {
       sendData(selectElement.id, selectElement.value);
     });

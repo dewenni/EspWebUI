@@ -3,6 +3,8 @@
 The JS reader handles property access and key parameters forwarded through named
 functions/arrow functions, including conditional literal arguments. It does not
 execute JavaScript or try to resolve runtime-generated keys.
+Unused-key warnings apply to project texts; shared library texts may be unused
+by an individual project. Missing and duplicate keys are checked across both.
 """
 
 import ast
@@ -306,7 +308,10 @@ def check_translations(output_dir):
     for key, count in sorted(Counter(declarations).items()):
         if count > 1:
             logging.warning("Doppelter Eintrag in lang.js: '%s' kommt %d mal vor", key, count)
-    for key in sorted(declared - html.keys - js_keys):
+    # A library provides vocabulary for multiple projects. Only project-owned
+    # declarations must all be used by this particular application.
+    project_declared = set(javascript_keys(sources[1])[0])
+    for key in sorted(project_declared - html.keys - js_keys):
         logging.warning("Schlüssel aus lang.js wird weder in HTML noch in JavaScript verwendet: '%s'", key)
     missing = (html.keys | js_keys) - declared
     for key in sorted(missing):

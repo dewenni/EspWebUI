@@ -1,69 +1,86 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr" data-theme="dark">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <title>ESP32-WebUI</title>
-    <link rel="icon" href="/favicon.svg" sizes="any" type="image/svg+xml" />
-    <link rel="stylesheet" type="text/css" href="lib.css" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  </head>
-  <body>
-    <dialog open>
-      <article>
-        <h2>ESP32-WebUI</h2>
-        <p>Please Login</p>
-        <form id="loginForm">
-          <input
-            id="username"
-            type="text"
-            name="username"
-            placeholder="user name"
-            required />
-          <input
-            id="password"
-            type="password"
-            name="password"
-            placeholder="password"
-            required />
-          <button type="submit">Login</button>
-        </form>
-      </article>
-    </dialog>
-
-    <script>
-      function setValidation(data) {
-        var element = document.getElementById(data.id);
-        if (element) {
-          if (data.valid) {
-            element.removeAttribute("aria-invalid");
-          } else {
-            element.setAttribute("aria-invalid", "true");
-          }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{PROJECT_TITLE}}</title>
+  <link rel="icon" href="/favicon.svg" sizes="any" type="image/svg+xml" />
+  <link rel="stylesheet" href="/lib.css" />
+  <link rel="stylesheet" href="/user.css" />
+  <style>
+    body.login-page { min-height: 100vh; min-height: 100dvh; margin: 0; padding: 1.5rem; display: grid; place-items: center; background: var(--ui-background, #141a22); color: var(--ui-text, #d8e1eb); }
+    .login-card { width: 100%; max-width: 400px; margin: 0; padding: 1.75rem; border: 1px solid var(--ui-border, #334355); border-radius: 0.75rem; background: var(--ui-surface, #1c2530); box-shadow: none; }
+    .login-brand { margin: 0 0 1.5rem; font-size: 0.8rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ui-muted, #9eafbf); overflow-wrap: anywhere; }
+    .login-card h1 { margin: 0 0 1.25rem; font-size: 1.5rem; }
+    .login-card label { font-size: 0.9rem; }
+    .login-card input { width: 100%; }
+    .login-card button { width: 100%; margin: 0.5rem 0 0; }
+    .login-card form { margin: 0; }
+    .login-error { margin: 0.5rem 0; font-size: 0.85rem; color: var(--pico-del-color, #e2959b); }
+    .login-error[hidden] { display: none; }
+    @media (max-width: 420px) { body.login-page { padding: 1rem; } .login-card { padding: 1.25rem; } }
+  </style>
+</head>
+<body class="login-page">
+  <main class="login-card">
+    <p class="login-brand">{{PROJECT_TITLE}}</p>
+    <h1 data-login-text="heading">Sign in</h1>
+    <form id="loginForm">
+      <label for="username" data-login-text="username">Username</label>
+      <input id="username" type="text" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" required />
+      <label for="password" data-login-text="password">Password</label>
+      <input id="password" type="password" name="password" autocomplete="current-password" required />
+      <p id="loginError" class="login-error" role="alert" hidden></p>
+      <button id="loginSubmit" type="submit" data-login-text="submit">Sign in</button>
+    </form>
+  </main>
+  <script>
+    const de = (navigator.languages?.[0] || navigator.language || 'en').toLowerCase().startsWith('de');
+    const text = de ? {
+      heading: 'Anmelden', username: 'Benutzername', password: 'Passwort', submit: 'Anmelden',
+      invalid: 'Benutzername oder Passwort ist nicht korrekt.', failed: 'Anmeldung fehlgeschlagen. Bitte erneut versuchen.'
+    } : {
+      heading: 'Sign in', username: 'Username', password: 'Password', submit: 'Sign in',
+      invalid: 'Username or password is incorrect.', failed: 'Sign-in failed. Please try again.'
+    };
+    document.documentElement.lang = de ? 'de' : 'en';
+    document.querySelectorAll('[data-login-text]').forEach(element => { element.textContent = text[element.dataset.loginText]; });
+    const form = document.getElementById('loginForm');
+    const button = document.getElementById('loginSubmit');
+    const error = document.getElementById('loginError');
+    form.addEventListener('input', () => {
+      error.hidden = true;
+      form.querySelectorAll('[aria-invalid]').forEach(input => input.removeAttribute('aria-invalid'));
+    });
+    form.addEventListener('submit', async function(event) {
+      event.preventDefault();
+      if (button.disabled) return;
+      button.disabled = true;
+      button.setAttribute('aria-busy', 'true');
+      error.hidden = true;
+      try {
+        const response = await fetch('/login', { method: 'POST', body: new FormData(this), headers: { Accept: 'application/json' } });
+        if (!response.ok) throw new Error('Login request failed');
+        const data = await response.json();
+        if (data.success) {
+          window.location.href = '/';
+        } else {
+          ['username', 'password'].forEach(id => {
+            const input = document.getElementById(id);
+            if (data[id + 'Valid'] === false) input.setAttribute('aria-invalid', 'true');
+            else input.removeAttribute('aria-invalid');
+          });
+          error.textContent = text.invalid;
+          error.hidden = false;
         }
+      } catch (_) {
+        error.textContent = text.failed;
+        error.hidden = false;
+      } finally {
+        button.disabled = false;
+        button.removeAttribute('aria-busy');
       }
-
-      document
-        .getElementById("loginForm")
-        .addEventListener("submit", function (event) {
-          event.preventDefault();
-
-          fetch("/login", {
-            method: "POST",
-            body: new FormData(this),
-            headers: { Accept: "application/json" },
-          })
-            .then((response) => response.json())
-            .then((data) => {
-              if (data.success) {
-                window.location.href = "/";
-              } else {
-                setValidation({ id: "username", valid: data.usernameValid });
-                setValidation({ id: "password", valid: data.passwordValid });
-              }
-            })
-            .catch((error) => console.error("Error:", error));
-        });
-    </script>
-  </body>
+    });
+  </script>
+</body>
 </html>

@@ -45,3 +45,6 @@ Todo.txt
 *.exe
 *.out
 *.app
+
+# Python build/check caches
+__pycache__/
