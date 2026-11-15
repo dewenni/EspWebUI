@@ -610,6 +610,8 @@ async function loadConfig() {
 
     // update UI-Elementes based on config.json
     updateUI(config);
+    // Use the device configuration for the first translation, even without WebSocket.
+    localizePage(String(config.lang) === "1" ? "en" : "de");
   } catch (error) {
     console.error("Error loading config:", error);
   }

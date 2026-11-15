@@ -1,19 +1,9 @@
-# v0.0.13
-
-## what's new
-
-[NEW] Shared settings categories with horizontal tabs or a sidebar, responsive dropdown navigation and German/English labels.
-
-[NEW] Compact, theme-aware login page with the application title and German/English browser-language selection.
+# v0.0.14
 
 ## changelog
 
-[NEW] Add client-specific JSON WebSocket replies and a callback that includes the requesting client ID.
+[FIX] Initialize the WebUI language from `config.json` instead of translating to German before the configured language is known. The configured language is also applied when WebSocket communication is unavailable.
 
-[NEW] Expose browser events for WebSocket connections, disconnections and application-specific messages.
+[FIX] Use German as the fallback for a missing or invalid language setting; preserve language switching during operation.
 
-[CHANGE] Support local-only controls through `data-ui-local` and make the legacy GitHub version dialog optional for projects that show updates directly on their Tools page.
-
-[FIX] Only report unused project translations; shared library vocabulary may remain unused by individual applications.
-
-[DOC] Document settings navigation and application integration hooks.
+Fixes the initial language switch reported in [ESP_Buderus_KM271 #183](https://github.com/dewenni/ESP_Buderus_KM271/issues/183).

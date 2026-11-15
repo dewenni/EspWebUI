@@ -7,7 +7,6 @@ document.addEventListener("DOMContentLoaded", function () {
   setupWS();
   synchronizeDataSyncFields();
   initializeVisibilityBasedOnSwitches();
-  localizePage("de");
   loadConfig();
 
   // Event Listener for Reload-Button
