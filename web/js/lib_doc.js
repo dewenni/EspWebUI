@@ -51,17 +51,7 @@ document.addEventListener("DOMContentLoaded", function () {
       xhr.send(formData);
     });
 
-  // CONFIG: send form data for config file upload
-  document
-    .getElementById("file_upload_form")
-    .addEventListener("submit", function (event) {
-      event.preventDefault();
-      var form = document.getElementById("file_upload_form");
-      var formData = new FormData(form);
-      var xhr = new XMLHttpRequest();
-      xhr.open("POST", "/config-upload", true);
-      xhr.send(formData);
-    });
+  initializeConfigFiles();
 
   // CONFIG: open dialog to show config.json
   document
@@ -69,7 +59,8 @@ document.addEventListener("DOMContentLoaded", function () {
     .addEventListener("click", function () {
       const dialog = document.getElementById("open_config_dialog");
       dialog.showModal();
-      fetch("/config.json")
+      sendData("config_files", "status");
+      fetch("/config.json", { cache: "no-store" })
         .then((response) => response.json())
         .then((data) => {
           document.getElementById("config_output").textContent = JSON.stringify(

@@ -1,9 +1,19 @@
-# v0.0.14
+# v0.0.15
+
+## what's new
+
+[NEW] Shared configuration backup, restore, backup download and file timestamps for application Tools pages.
 
 ## changelog
 
-[FIX] Initialize the WebUI language from `config.json` instead of translating to German before the configured language is known. The configured language is also applied when WebSocket communication is unavailable.
+[NEW] Copy and verify backups through a temporary file before atomically replacing the destination. Preserve existing files on write, space or replacement errors.
 
-[FIX] Use German as the fallback for a missing or invalid language setting; preserve language switching during operation.
+[NEW] Stage imports under a separate filename, validate JSON and an optional project section, and commit completed imports from the application loop. Interrupted, concurrent or malformed uploads cannot replace the active configuration.
 
-Fixes the initial language switch reported in [ESP_Buderus_KM271 #183](https://github.com/dewenni/ESP_Buderus_KM271/issues/183).
+[NEW] Provide an authenticated backup download without restoring the saved configuration first.
+
+[CHANGE] Report completed configuration operations through translated success/error fly-ins. Keep action buttons busy until the operation is confirmed.
+
+[FIX] Vertically center fly-in messages and restart their hide timer when a newer message arrives.
+
+[TEST] Add maintained file-transfer and frontend regression checks, including write/replacement failures, disconnected uploads and backup-download authentication.

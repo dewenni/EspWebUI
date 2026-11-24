@@ -2,6 +2,7 @@
 #pragma once
 
 #include <ArduinoJson.h>
+#include <atomic>
 #include <AsyncJson.h>
 #include <ESPAsyncWebServer.h>
 #include <LittleFS.h>
@@ -102,6 +103,11 @@ public:
     callbackWebElementClient = callback;
   }
 
+  // Call file commands from the application loop, never the AsyncTCP task.
+  void setConfigFileSection(const char *section) { configFileSection = section; }
+  void setCallbackConfigFileReady(bool (*callback)()) { callbackConfigFileReady = callback; }
+  bool handleConfigFileCommand(const char *elementID, const char *value);
+
   // set credentials for authentication
   void setCredentials(const char *username, const char *password) {
     strncpy(config.username, username, sizeof(config.username) - 1);
@@ -114,6 +120,14 @@ public:
   void setAuthentication(bool enableAuth) { config.enableAuth = enableAuth; }
 
 private:
+  const char *configFileSection = nullptr;
+  bool (*callbackConfigFileReady)() = nullptr;
+  std::atomic<bool> configFileBusy{false};
+  std::atomic<bool> configUploadPending{false};
+  void processConfigUpload();
+  void sendConfigFileStatus(const char *result = nullptr, const char *area = nullptr);
+  void setupConfigUploadRoute();
+
   AsyncWebServer server;
   AsyncWebSocket ws;
 

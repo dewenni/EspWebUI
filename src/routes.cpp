@@ -147,66 +147,7 @@ void EspWebUI::setupRoutes() {
     request->send(LittleFS, "/config.json", "application/json");
   });
 
-  // config.json upload
-  server.on(
-      "/config-upload", HTTP_POST,
-      [this](AsyncWebServerRequest *request) {
-        if (!isAuthenticated(request)) {
-          request->send(401, "application/json", "{\"success\": false, \"error\": \"not_authenticated\"}");
-          return;
-        }
-        request->send(200, "text/plain", "upload done!");
-      },
-      [this](AsyncWebServerRequest *request, const String &filename, size_t index, uint8_t *data, size_t len, bool final) {
-        // upload_handler runs once per received chunk, before the request
-        // handler above returns its response - re-check here too so an
-        // unauthenticated request can't overwrite config.json via chunks
-        // even though the final response above will correctly report 401.
-        if (!isAuthenticated(request)) {
-          return;
-        }
-        static File uploadFile;
-        const String targetFilename = "/config.json";     // fix to config.json
-        const String tempFilename = "/config.json.upload"; // staged until complete
-
-        // Upload into a temporary file and only move it into place once the
-        // last chunk has arrived. Opening the real config.json with "w"
-        // truncated it immediately, so a browser tab closed mid-upload - or a
-        // dropped WiFi link, since "final" then never fires - left a truncated
-        // JSON prefix behind. On the next boot the device failed to parse its
-        // own config and came up as an access point with no credentials.
-        if (!index) { // firs call for upload
-          callbackUpload(UPLOAD_BEGIN, "uploading...");
-          ESP_LOGI(TAG, "Upload Start: %s\n", filename.c_str());
-          uploadFile = LittleFS.open(tempFilename, "w");
-
-          if (!uploadFile) {
-            callbackUpload(UPLOAD_ERROR, "error on file close!");
-            ESP_LOGE(TAG, "error on file close!");
-            return;
-          }
-        }
-
-        if (len) { // if there are still data to send...
-          uploadFile.write(data, len);
-        }
-
-        if (final) {
-          if (uploadFile) {
-            uploadFile.close();
-            LittleFS.remove(targetFilename); // rename() cannot overwrite on LittleFS
-            if (LittleFS.rename(tempFilename, targetFilename)) {
-              ESP_LOGI(TAG, "UploadEnd: %s, %u B\n", filename.c_str(), index + len);
-              callbackUpload(UPLOAD_FINISH, "upload done!");
-            } else {
-              ESP_LOGE(TAG, "failed to move uploaded config into place");
-              callbackUpload(UPLOAD_ERROR, "error on file close!");
-            }
-          } else {
-            callbackUpload(UPLOAD_ERROR, "error on file close!");
-          }
-        }
-      });
+  setupConfigUploadRoute();
 
   // Route für OTA-Updates
   server.on(

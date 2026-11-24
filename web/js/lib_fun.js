@@ -103,13 +103,18 @@ function setupWS() {
   };
 }
 
+let msgBarHideTimer;
+let msgBarRemoveTimer;
+
 function showMsgBar(message) {
+  clearTimeout(msgBarHideTimer);
+  clearTimeout(msgBarRemoveTimer);
   const msgBar = document.getElementById("msgBar");
   const msgBarText = document.getElementById("msgBarText");
 
   // update the message text
   msgBarText.textContent = message.text;
-  msgBar.style.display = "block";
+  msgBar.style.display = "flex";
 
   // Force reflow to start slide-down animation
   void msgBar.offsetWidth;
@@ -117,11 +122,11 @@ function showMsgBar(message) {
   // slide up the message bar
   msgBar.classList.add("visible");
 
-  // hide the message bar after 2 seconds
-  setTimeout(() => {
+  // Restart the display duration when another message arrives.
+  msgBarHideTimer = setTimeout(() => {
     msgBar.classList.remove("visible");
 
-    setTimeout(() => {
+    msgBarRemoveTimer = setTimeout(() => {
       msgBar.style.display = "none";
     }, 500);
   }, 2500);
@@ -456,6 +461,7 @@ function file_sub_fun(obj) {
 
 // localization of web texts
 function localizePage(lang = "en") {
+  document.documentElement.lang = lang;
   document.querySelectorAll("[data-i18n]").forEach((elem) => {
     const i18nValue = elem.getAttribute("data-i18n");
     const [translationPart, addon] = i18nValue.split("++", 2);
@@ -482,6 +488,7 @@ function localizePage(lang = "en") {
     }
     elem.innerText = text;
   });
+  renderConfigFileStatus();
 }
 
 // to show reload bar if connection is lost

@@ -22,6 +22,7 @@ async function check(language, expected) {
   const context = vm.createContext({
     console: { log() {}, error(message) { throw new Error(message); } },
     document: {
+      documentElement: { lang: 'de' },
       addEventListener(type, callback) { if (type === 'DOMContentLoaded') start = callback; },
       getElementById(id) { return id === 'version_dialog' ? null : id === 'cfg_lang' ? languageSelect : genericElement; },
       querySelectorAll(selector) { return selector === '[data-i18n]' ? [title] : []; },
@@ -31,6 +32,8 @@ async function check(language, expected) {
     user_translations: {},
     fetch: () => new Promise(resolve => { resolveConfig = resolve; }),
     initializeSettingsNavigation() {},
+    initializeConfigFiles() {},
+    renderConfigFileStatus() {},
     setTimeout, clearTimeout,
   });
   vm.runInContext(fun, context);

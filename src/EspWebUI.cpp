@@ -40,6 +40,8 @@ void EspWebUI::begin() {
 
 void EspWebUI::loop() {
 
+  processConfigUpload();
+
   unsigned long currentTime = millis();
   if (currentTime - lastHeartbeatTime >= 3000) {
     lastHeartbeatTime = currentTime;

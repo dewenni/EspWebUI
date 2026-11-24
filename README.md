@@ -148,3 +148,29 @@ can provide their own inline update interface and handlers.
 
 Unused-translation warnings apply to project vocabulary only. Missing translations
 and duplicate declarations are still checked across library and project texts.
+
+
+## Configuration backups and imports
+
+Configure the optional project section with `setConfigFileSection("jaro")` or
+`setConfigFileSection("km271")`. Validation checks for a JSON object containing
+that section as an object; it does not validate every configuration field.
+
+Forward `config_files` commands to `handleConfigFileCommand(elementID, value)`
+on the application loop. The supported values are `status`, `backup`, and
+`restore`. Keep calling `EspWebUI::loop()`; staged imports are committed there.
+`setCallbackConfigFileReady(callback)` can reject file operations while the
+application is busy, for example during OTA or timed motor movement.
+
+Backups use `/config_backup.json`. `/config-backup-download` requires the same
+authentication as the WebUI and downloads the saved snapshot without restoring
+it. Temporary files are checked before replacement; incomplete imports are not
+used as boot-recovery files. Timestamps require a valid device clock.
+
+The upload endpoint returns HTTP 202 for a staged file. The `configFiles`
+WebSocket result confirms validation and replacement. `UPLOAD_FINISH` now runs
+on the application loop after an import or restore; applications must apply the
+new configuration, or restart before saving their old in-memory configuration.
+The Jarolift and Buderus integrations restart after this callback.
+
+See [Host checks](tests/README.md) for software checks and hardware-test limits.
