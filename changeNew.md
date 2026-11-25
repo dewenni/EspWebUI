@@ -1,19 +1,9 @@
-# v0.0.15
+# v0.0.16
 
-## what's new
+## Improvements and fixes
 
-[NEW] Shared configuration backup, restore, backup download and file timestamps for application Tools pages.
+- Generate gzip assets with a fixed zero timestamp so unchanged WebUI sources produce stable headers.
+- Write assembled HTML, CSS, JavaScript and generated C headers only when their content changes. Repeated builds preserve file timestamps and avoid unnecessary firmware recompilation.
+- Add host regression checks for clean generation, unchanged repeat runs, changed HTML and login titles, and lossless deterministic gzip.
 
-## changelog
-
-[NEW] Copy and verify backups through a temporary file before atomically replacing the destination. Preserve existing files on write, space or replacement errors.
-
-[NEW] Stage imports under a separate filename, validate JSON and an optional project section, and commit completed imports from the application loop. Interrupted, concurrent or malformed uploads cannot replace the active configuration.
-
-[NEW] Provide an authenticated backup download without restoring the saved configuration first.
-
-[CHANGE] Report completed configuration operations through translated success/error fly-ins. Keep action buttons busy until the operation is confirmed.
-
-[FIX] Vertically center fly-in messages and restart their hide timer when a newer message arrives.
-
-[TEST] Add maintained file-transfer and frontend regression checks, including write/replacement failures, disconnected uploads and backup-download authentication.
+This release addresses the WebUI generator portion of [ESP_Buderus_KM271 #189](https://github.com/dewenni/ESP_Buderus_KM271/issues/189). The simulation source and output handling are fixed in the application repository.

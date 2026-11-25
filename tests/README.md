@@ -31,3 +31,15 @@ import with an arbitrary filename, rejection of the other project's JSON,
 timestamps with/without synchronized time, disconnected uploads and restart
 with the restored network/authentication settings. Backups contain credentials
 and only cover `config.json`, not NVS counters/history or external data.
+
+Web asset generation (Python 3.9+, no PlatformIO dependency):
+
+```sh
+python3 -B tests/test_build_webui.py
+```
+
+This runs the actual generator in a temporary project with a stubbed SCons
+environment. It checks clean generation, unchanged file timestamps, propagation
+of HTML/title edits, and stable, lossless gzip with a zero timestamp. It does
+not prove incremental firmware builds; verify those with two consecutive
+PlatformIO builds using this local library.
