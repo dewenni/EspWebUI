@@ -3,12 +3,21 @@ import re
 import gzip
 import glob
 import html
+from pathlib import Path
 from SCons.Script import DefaultEnvironment
 
 def ensure_directory_exists(path):
         if not os.path.exists(path):
             os.makedirs(path)
             print(f"folder '{path}' was created.")
+
+def write_if_changed(output_file_path, content):
+    # Preserve timestamps so unchanged assets do not trigger recompilation.
+    path = Path(output_file_path)
+    data = content.encode('utf-8')
+    if not path.exists() or path.read_bytes() != data:
+        path.write_bytes(data)
+
 
 def compress_to_gzip_c_array(input_file_path, output_file_path, var_name):
     with open(input_file_path, 'rb') as file:
@@ -17,11 +26,11 @@ def compress_to_gzip_c_array(input_file_path, output_file_path, var_name):
 
 
 def write_gzip_c_array(content, output_file_path, var_name):
-    compressed_content = gzip.compress(content)
+    compressed_content = gzip.compress(content, mtime=0)
     c_array_content = ', '.join('0x{:02x}'.format(byte) for byte in compressed_content)
-    with open(output_file_path, 'w') as file:
-        file.write('const uint8_t PROGMEM ' + var_name + '[] = {' + c_array_content + '};\n')
-        file.write(f'const unsigned int {var_name}_size = {len(compressed_content)};\n')
+    write_if_changed(output_file_path,
+                     'const uint8_t PROGMEM ' + var_name + '[] = {' + c_array_content + '};\n'
+                     + f'const unsigned int {var_name}_size = {len(compressed_content)};\n')
 
 
 def render_login_html(template, project_html):
@@ -40,9 +49,9 @@ def convert_to_c_array(input_file_path, output_file_path, var_name):
     c_array_content = ', '.join(['0x{:02x}'.format(byte) for byte in content])
     
     # C-Array in eine neue Datei schreiben
-    with open(output_file_path, 'w') as file:
-        file.write('const uint8_t PROGMEM ' + var_name + '[] = {' + c_array_content + '};\n')
-        file.write(f'const unsigned int {var_name}_size = {len(content)};\n')
+    write_if_changed(output_file_path,
+                     'const uint8_t PROGMEM ' + var_name + '[] = {' + c_array_content + '};\n'
+                     + f'const unsigned int {var_name}_size = {len(content)};\n')
 
 def convert_to_c_literal(input_file_path, output_file_path, var_name):
     # HTML-Datei einlesen
@@ -54,9 +63,7 @@ def convert_to_c_literal(input_file_path, output_file_path, var_name):
     c_literal_size = f'const unsigned int {var_name}_size = {len(content)};\n'
     
     # C-String in eine neue Datei schreiben
-    with open(output_file_path, 'w', encoding='utf-8') as file:
-        file.write(c_literal_content)
-        file.write(c_literal_size)
+    write_if_changed(output_file_path, c_literal_content + c_literal_size)
 
 
 
@@ -103,8 +110,7 @@ def main(web_dir, output_dir):
                 combined_html += content.strip() + '\n'
 
     # Schreiben Sie die kombinierte Definition in die Ausgabedatei
-    with open(output_file_html, 'w') as file:
-        file.write(combined_html)
+    write_if_changed(output_file_html, combined_html)
 
     compress_to_gzip_c_array(output_file_html, output_file_br, 'gzip_user_html')
 
@@ -147,8 +153,7 @@ def main(web_dir, output_dir):
             combined_content += file.read() + '\n'
 
     # Schreiben Sie die kombinierte Definition in die Ausgabedatei
-    with open(output_file_css, 'w') as file:
-        file.write(combined_content)
+    write_if_changed(output_file_css, combined_content)
 
     compress_to_gzip_c_array(output_file_css, output_c_file, 'gzip_lib_css')
 
@@ -174,8 +179,7 @@ def main(web_dir, output_dir):
             combined_content += file.read() + '\n'
 
     # Schreiben Sie die kombinierte Definition in die Ausgabedatei
-    with open(output_file_css, 'w') as file:
-        file.write(combined_content)
+    write_if_changed(output_file_css, combined_content)
 
     compress_to_gzip_c_array(output_file_css, output_c_file, 'gzip_user_css')
 
@@ -202,8 +206,7 @@ def main(web_dir, output_dir):
             combined_content += file.read() + '\n'
 
     # Schreiben Sie die kombinierte Definition in die Ausgabedatei
-    with open(output_file_js, 'w') as file:
-        file.write(combined_content)
+    write_if_changed(output_file_js, combined_content)
 
     compress_to_gzip_c_array(output_file_js, output_file_br_js, 'gzip_lib_js')
 
@@ -229,8 +232,7 @@ def main(web_dir, output_dir):
             combined_content += file.read() + '\n'
 
     # Schreiben Sie die kombinierte Definition in die Ausgabedatei
-    with open(output_file_js, 'w') as file:
-        file.write(combined_content)
+    write_if_changed(output_file_js, combined_content)
 
     compress_to_gzip_c_array(output_file_js, output_file_br_js, 'gzip_user_js')
 
